@@ -5,8 +5,14 @@ const fs = require('fs');
 const qs = require('querystring');
 const url = require('url');
 
-const PORT = 8080;
+const PORT = 3000;
 
+/** @function serveIndex
+ * Serves a directory and lists its files, unless it contains index.html
+ * @param {string} path - the path (WITH public/) to the directory
+ * @param {http.serverResponse} res - the http response object
+ * @param {string} path - the path (WITHOUT public/) to the directory
+ */
 function serveIndex(path, res, pathWithoutPublic) {
 	fs.readdir(path, function(err, files) {
 		if(err) {
@@ -65,10 +71,7 @@ function serveFile(path, res) {
  * @param {http.ClientRequest} req - the http request object
  * @param {http.ServerResponse} res - the http response object
  */
-function handleRequest(req, res) {
-    // Map request urls to files
-    
-
+function handleRequest(req, res) {  
     switch(req.url) {
         case '/':
             serveIndex('public', res);
@@ -93,6 +96,12 @@ function handleRequest(req, res) {
     }
 }
 
+
+/** @function isDirectory
+ * Returns true if the path is a directory
+ * @param {string} path - the path to the directory or file
+ * @param {http.ServerResponse} res - the http response object
+ */
 function isDirectory(path, res) {
 	console.log("\nChecking if " + path + " is a directory...");
 	if(fs.existsSync(path)) {
@@ -105,6 +114,11 @@ function isDirectory(path, res) {
 	}
 }
 
+/** @function isFile
+ * Returns true if the path is a file
+ * @param {string} path - the path to the directory or file
+ * @param {http.ServerResponse} res - the http response object
+ */
 function isFile(path, res) {
 	console.log("Checking if " + path + " is a file...");
 	if(fs.existsSync(path)) {
@@ -117,6 +131,10 @@ function isFile(path, res) {
 	}
 }
 
+/** @function createError404
+ * Creates an error 404
+ * @param {http.ServerResponse} res - the http response object
+ */
 function createError404(res) {
 	console.log("Error 404");
 	res.statusCode = 404;
