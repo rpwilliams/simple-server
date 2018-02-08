@@ -2,10 +2,12 @@
 
 const http = require('http');
 const fs = require('fs');
+const qs = require('querystring');
+const url = require('url');
 
 const PORT = 8080;
 
-function serveIndex(path, res) {
+function serveIndex(path, res, pathWithoutPublic) {
 	fs.readdir(path, function(err, files) {
 		if(err) {
 			console.log(err);
@@ -15,7 +17,14 @@ function serveIndex(path, res) {
 		var html = "<p>Index of " + path + "</p>";
         html += "<ul>";
         html += files.map(function(item){
-            return "<li><a href='" + item + "'>" + item + "</a></li>";
+        	console.log("Path without public: " + pathWithoutPublic + '/' + item);
+        	if(pathWithoutPublic !== undefined) {
+        		return "<li><a href='" + pathWithoutPublic + '/' + item + "'>" + item + "</a></li>";
+        	}
+        	else {
+        		return "<li><a href='" + item + "'>" + item + "</a></li>";
+        	}
+            
         }).join("");
         html += "</ul>";
         res.end(html);
@@ -29,11 +38,9 @@ function serveIndex(path, res) {
  */
 function serveFile(path, res) {
 	/* Check for 404: File Not Found */
-	fs.exists(path, function(exists) {
+	fs.existsSync(path, function(exists) {
 		if(!exists) {
-			console.log("Error 404");
-			res.statusCode = 404;
-			res.end("Error 404: File not found")
+			createError404(res);
 		}
 	});
 
@@ -55,18 +62,21 @@ function serveFile(path, res) {
  */
 function handleRequest(req, res) {
     // Map request urls to files
+    
+
     switch(req.url) {
         case '/':
             serveIndex('public', res);
             break;
         default:
         	var path = 'public' + req.url;
+        	console.log(req.url);
         	if(isDirectory(path, res)) {
-        		console.log(path + " is a directory! Now serving the index...");
-        		serveIndex(path, res);
+        		console.log(path + " is a directory! Now serving the index.");
+        		serveIndex(path, res, req.url);
         	}
         	else if(isFile(path, res)) {
-        		console.log(path + " is a file! Now serving the file...");
+        		console.log(path + " is a file! Now serving the file.");
         		serveFile(path, res);
         	}
         	break;
@@ -74,12 +84,13 @@ function handleRequest(req, res) {
 }
 
 function isDirectory(path, res) {
-	console.log("Checking if " + path + " is a directory...");
+	console.log("\nChecking if " + path + " is a directory...");
 	if(fs.existsSync(path)) {
 		return fs.lstatSync(path).isDirectory();
 	}
 	else {
 		console.log("Directory could not be found.");
+		createError404(res);
 		return;
 	}
 }
@@ -91,8 +102,15 @@ function isFile(path, res) {
 	}
 	else {
 		console.log("File could not be found.");
+		createError404(res);
 		return;
 	}
+}
+
+function createError404(res) {
+	console.log("Error 404");
+	res.statusCode = 404;
+	res.end("Error 404");
 }
 
 // Create the web server
