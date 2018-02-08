@@ -22,6 +22,11 @@ function serveIndex(path, res, pathWithoutPublic) {
         		return "<li><a href='" + pathWithoutPublic + '/' + item + "'>" + item + "</a></li>";
         	}
         	else {
+        		/* If the directory has an index.html, serve that instead */
+        		// if(item == "index.html") {
+        		// 	serveFile(path, res);
+        		// 	return;
+        		// }
         		return "<li><a href='" + item + "'>" + item + "</a></li>";
         	}
             
@@ -73,6 +78,11 @@ function handleRequest(req, res) {
         	console.log(req.url);
         	if(isDirectory(path, res)) {
         		console.log(path + " is a directory! Now serving the index.");
+        		if(fs.existsSync(path + "/index.html")) {
+					console.log("\nOpe just kidding! It had an index.html, serving that instead.");
+					serveFile(path + "/index.html", res);
+					break;
+				}
         		serveIndex(path, res, req.url);
         	}
         	else if(isFile(path, res)) {

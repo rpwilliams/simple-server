@@ -4,7 +4,7 @@ DONE: 1) Serve files in the public directory when requested, i.e. an HTTP reques
 
 DONE: 2) Use asynchronous methods (i.e. fs.readFile, fs.readdir) to load files and determine the contents of the directory (since we don't know how many files to expect, we won't use a cache strategy).  Refer to the FileSystem documentation for details: https://nodejs.org/api/fs.html (Links to an external site.)Links to an external site. 
 
-3) Generate an index page listing a directory's contents when that directory is requested (i.e. the http request for subdirectory/ should list the contents of public/subdirectory, and a request for / should list the contents of public/).  BUT, if the directory/subdirectory has an index.html file defined, it should be served instead.
+DONE: 3) Generate an index page listing a directory's contents when that directory is requested (i.e. the http request for subdirectory/ should list the contents of public/subdirectory, and a request for / should list the contents of public/).  BUT, if the directory/subdirectory has an index.html file defined, it should be served instead.
 
 4) Serve a 404, file not found error if the resource requested does not exist.
 
